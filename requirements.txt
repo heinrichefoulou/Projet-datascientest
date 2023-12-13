@@ -1,0 +1,12 @@
+altair
+pandas
+streamlit
+seaborn
+matplotlib
+plotly
+xgboost
+scikit-learn
+joblib
+dill
+statsmodels
+shap
