@@ -71,7 +71,7 @@ def create_visualisations(df, variables):
                 x=value_counts.index, 
                 y=value_counts, 
                 name=var,
-                text=percentages,  # Afficher les pourcentages
+                #text=percentages,  # Afficher les pourcentages
                 textposition='auto',
                 hoverinfo='x+y+text'  # Afficher info lors du survol de la souris
             )
