@@ -1678,7 +1678,7 @@ if page == pages[5]:
           'poutcome' : "Variable révélant le résultat de la campagne marketing précédente avec 'unknown', 'other', 'failure', 'success'. Une majorité (74,6%) est classée 'unknown', souvent due à l'absence de contact précédent.",
           'deposit' : "Variable cible, indiquant si un client a souscrit à un dépôt à terme (Yes/No), avec 52,6% de refus et 47,4% de souscriptions."}
         #affichage 
-            for var in commentpred:
+            for var in selected_vars:
                 if var in commentpred:
                     st.info(f"{var}: {commentpred[var]}")
                 else:
