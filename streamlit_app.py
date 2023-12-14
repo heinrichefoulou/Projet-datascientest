@@ -1712,10 +1712,13 @@ if page == pages[5]:
     st.markdown('<p class="big-font">Proposition de Profil client à contacter</p>', unsafe_allow_html=True)
     st.write("""Notre analyse des données de souscription au dépôt à terme révèle des tendances intéressantes parmi les clients les plus susceptibles de souscrire. 
     Majoritairement, ce sont des managers, techniciens et ouvriers, avec une répartition variée parmi d'autres métiers. 
+    
     L'âge moyen des clients potentiels se situe autour de 38 ans, principalement dans la tranche de 30 à 34 ans. 
     Concernant le statut matrimonial, les clients mariés sont plus enclins à souscrire, suivis des célibataires et des divorcés. 
     Le niveau d'éducation le plus courant est le secondaire, suivi de près par le tertiaire. 
+    
     Sur le plan financier, les soldes bancaires varient généralement de 0 à 5 000K, bien que quelques cas extrêmes soient observés. La plupart des clients potentiels ne sont pas en défaut de paiement et n'ont pas de crédit immobilier ou de prêt personnel. 
     Il est recommandé de les contacter principalement par téléphone portable, particulièrement entre le 12 et le 15 du mois. 
     Mai est identifié comme le mois le plus propice aux souscriptions, suivant une durée d'appel moyenne de 7 minutes. Les clients potentiels ont généralement été contactés une seule fois et n'avaient souvent jamais été démarchés lors des campagnes précédentes. 
+    
     Finalement, ceux n'ayant jamais été contactés ou ayant eu des expériences positives dans les campagnes précédentes montrent une plus grande propension à souscrire.""")
