@@ -1718,4 +1718,4 @@ if page == pages[5]:
     Sur le plan financier, les soldes bancaires varient généralement de 0 à 5 000K, bien que quelques cas extrêmes soient observés. La plupart des clients potentiels ne sont pas en défaut de paiement et n'ont pas de crédit immobilier ou de prêt personnel. 
     Il est recommandé de les contacter principalement par téléphone portable, particulièrement entre le 12 et le 15 du mois. 
     Mai est identifié comme le mois le plus propice aux souscriptions, suivant une durée d'appel moyenne de 7 minutes. Les clients potentiels ont généralement été contactés une seule fois et n'avaient souvent jamais été démarchés lors des campagnes précédentes. 
-    Finalement, ceux n'ayant jamais été contactés ou ayant eu des expériences positives dans les campagnes précédentes montrent une plus grande propension à souscrire.")
+    Finalement, ceux n'ayant jamais été contactés ou ayant eu des expériences positives dans les campagnes précédentes montrent une plus grande propension à souscrire.""")
