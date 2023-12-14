@@ -1646,7 +1646,7 @@ if page == pages[5]:
         """,
         unsafe_allow_html=True
     )
-  st.markdown('<p class="big-font">Résultat des profils à démarcher</p>', unsafe_allow_html=True)
+    st.markdown('<p class="big-font">Résultat des profils à démarcher</p>', unsafe_allow_html=True)
     st.write(summary)
     st.write(summary2)
     with st.container():
