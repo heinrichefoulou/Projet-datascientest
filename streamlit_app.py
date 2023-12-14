@@ -72,7 +72,7 @@ def create_visualisations(df, variables):
                 y=value_counts, 
                 name=var,
                 hovertemplate='%{x}: %{y}<br>Pourcentage: %{text:.2f}%',  # Formatage du texte de survol
-                text=percentages
+                #text=percentages
             )
         else:
             data = go.Histogram(x=df[var], nbinsx=30, name=var)
