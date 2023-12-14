@@ -47,15 +47,39 @@ import shap
 
 df = pd.read_csv('bank.csv')
 #euros = "EUROS.jpg"
+#def create_visualisations(df, variables):
+    #rows = len(variables)
+    #fig = make_subplots(rows=rows, cols=1, subplot_titles=[f'Distribution de {var}' for var in variables])
+    #for i, var in enumerate(variables, start=1):
+        #if df[var].dtype == 'object':
+            #data = go.Bar(x=df[var].value_counts().index, y=df[var].value_counts(), name=var)
+        #else:
+            #data = go.Histogram(x=df[var], nbinsx=30, name=var)
+        #fig.add_trace(data, row=i, col=1)
+    #fig.update_layout(height=300 * rows, width=800, showlegend=False)
+    #return fig
+
 def create_visualisations(df, variables):
     rows = len(variables)
     fig = make_subplots(rows=rows, cols=1, subplot_titles=[f'Distribution de {var}' for var in variables])
+
     for i, var in enumerate(variables, start=1):
         if df[var].dtype == 'object':
-            data = go.Bar(x=df[var].value_counts().index, y=df[var].value_counts(), name=var)
+            value_counts = df[var].value_counts()
+            percentages = (value_counts / value_counts.sum() * 100).round(2)
+            data = go.Bar(
+                x=value_counts.index, 
+                y=value_counts, 
+                name=var,
+                text=percentages,  # Afficher les pourcentages
+                textposition='auto',
+                hoverinfo='x+y+text'  # Afficher info lors du survol de la souris
+            )
         else:
             data = go.Histogram(x=df[var], nbinsx=30, name=var)
+
         fig.add_trace(data, row=i, col=1)
+
     fig.update_layout(height=300 * rows, width=800, showlegend=False)
     return fig
 def create_plotly_countplot(df, x, hue, title):
