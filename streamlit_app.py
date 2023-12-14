@@ -71,7 +71,7 @@ def create_visualisations(df, variables):
                 x=value_counts.index, 
                 y=value_counts, 
                 name=var,
-                hovertemplate='%{x}: %{y}<br>Pourcentage: %{text:.2f}%',  # Formatage du texte de survol
+                hovertemplate='%{x}: %{y}<br>Pourcentage: %{percentages:.2f}%',  # Formatage du texte de survol
                 #text=percentages
             )
         else:
