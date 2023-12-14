@@ -1581,7 +1581,7 @@ if page == pages[5]:
         """,
         unsafe_allow_html=True
     )
-  st.markdown('<p class="big-font">Classification par probabilité de conversion</p>', unsafe_allow_html=True)
+    st.markdown('<p class="big-font">Classification par probabilité de conversion</p>', unsafe_allow_html=True)
     st.dataframe(filtered_df.head(50))
     prediction = model.predict(encoded_df)
 # Créer un histogramme des probabilités
@@ -1615,7 +1615,7 @@ if page == pages[5]:
         """,
         unsafe_allow_html=True
     )
-  st.markdown('<p class="big-font">Histogramme des probabilités</p>', unsafe_allow_html=True)
+    st.markdown('<p class="big-font">Histogramme des probabilités</p>', unsafe_allow_html=True)
     st.pyplot(fig)
 # Filtrer le DataFrame pour ne garder que les lignes avec probability > 0.5
     filtered_df = filtered_df[filtered_df['probability'] > 0.65]
