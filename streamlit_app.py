@@ -46,41 +46,27 @@ import xgboost
 import shap
 
 df = pd.read_csv('bank.csv')
-#euros = "EUROS.jpg"
-#def create_visualisations(df, variables):
-    #rows = len(variables)
-    #fig = make_subplots(rows=rows, cols=1, subplot_titles=[f'Distribution de {var}' for var in variables])
-    #for i, var in enumerate(variables, start=1):
-        #if df[var].dtype == 'object':
-            #data = go.Bar(x=df[var].value_counts().index, y=df[var].value_counts(), name=var)
-        #else:
-            #data = go.Histogram(x=df[var], nbinsx=30, name=var)
-        #fig.add_trace(data, row=i, col=1)
-    #fig.update_layout(height=300 * rows, width=800, showlegend=False)
-    #return fig
-
+euros = "euro.jpg"
 def create_visualisations(df, variables):
     rows = len(variables)
     fig = make_subplots(rows=rows, cols=1, subplot_titles=[f'Distribution de {var}' for var in variables])
-
     for i, var in enumerate(variables, start=1):
         if df[var].dtype == 'object':
             value_counts = df[var].value_counts()
             percentages = (value_counts / value_counts.sum() * 100).round(2)
             data = go.Bar(
-                x=value_counts.index, 
-                y=value_counts, 
+                x=value_counts.index,
+                y=value_counts,
                 name=var,
                 hovertemplate='%{x}: %{y}<br>Pourcentage: %{text:.2f}%',  # Formatage du texte de survol
                 text=percentages
             )
         else:
             data = go.Histogram(x=df[var], nbinsx=30, name=var)
-
         fig.add_trace(data, row=i, col=1)
-
     fig.update_layout(height=300 * rows, width=800, showlegend=False)
     return fig
+    
 def create_plotly_countplot(df, x, hue, title):
         # Définition de la palette de couleurs
     color_discrete_map = {'Yes': 'blue', 'No': 'red'}
@@ -100,6 +86,7 @@ def get_correlation_plot(variable):
         return create_plotly_histplot(df, variable, 'deposit', f'Relation entre {variable} et deposit')
     else:
         return create_plotly_countplot(df, variable, 'deposit', f'Relation entre {variable} et deposit')
+
 def plot_knn_scores(X_train, y_train, X_test, y_test):
     score_mi = []
     score_eu = []
@@ -137,7 +124,7 @@ def plot_knn_scores(X_train, y_train, X_test, y_test):
     return plt
 st.title('Projet : MARKETING BANCAIRE')
 st.sidebar.title("SOMMAIRE")
-pages=["Présentation du Projet", "Datavisualisation","Modélisation","Prédictions", "Utilisation professionnelle du projet", "Conclusion"]
+pages=["Présentation du Projet", "Datavisualisation","Modélisation","Application pour un Conseiller", "Outil pour le Marketing Téléphonique ", "Conclusion"]
 
 page=st.sidebar.radio("Aller vers", pages)
 
@@ -176,12 +163,10 @@ if page == pages[0] :
   st.markdown('<p class="big-font">Présentation du projet</p>', unsafe_allow_html=True)  
   #st.header("Présentation du projet")
   
-  st.write("Dans le cadre de notre formation de Data Analyst, nous avons eu l\'opportunité de développer \
+  st.write("Dans le cadre de notre formation de Data Analyste, nous avons eu l\'opportunité de développer \
   un projet axé sur la prédiction de souscription à un compte à terme (CAT) par les clients d\'une institution financière.")
   
-  st.write("Dans un contexte économique marqué par le blocage du taux de rémunération du livret A, une remontée des taux et une forte inflation,\
-  les comptes à terme sont devenus une alternative de plus en plus privilégiée, comme en témoigne l\'augmentation significative de leurs encours,\
-  passant de 80 milliards d’euros en janvier 2023 à 122 milliards en juillet 2023 selon la Banque de France.")
+  st.write("Le milieu économique actuel, caractérisé par une inflation généralisée et une augmentation des taux directeurs par la Banque Centrale Européenne, combiné à la stagnation des rémunérations sur les comptes d'épargne à court terme, a rendu les comptes à terme (CAT) de plus en plus séduisants en tant que produits financiers. Les CAT gagnent en popularité comme option alternative, ce qui se reflète dans l'augmentation notable de leur volume total, qui est passé de 80 milliards d'euros en janvier 2023 à 122 milliards en juillet 2023, d'après les données de la Banque de France.")
 
   st.write("Notre objectif principal était de construire un modèle prédictif fiable, capable de déterminer la probabilité de souscription à un CAT.")
 
@@ -194,8 +179,8 @@ if page == pages[0] :
   st.write("Ce projet ne se limite pas seulement à une application académique, mais offre des perspectives concrètes pour améliorer les stratégies \
   de marketing et optimiser la prise de décision dans le secteur financier.")
 
-#if page == pages[0] :
-  #st.image(euros)
+if page == pages[0] :
+    st.image(euros)
 
 if page == pages[1] :
   st.markdown(
@@ -239,22 +224,22 @@ if page == pages[1] :
       st.dataframe(df.head())
       st.write("Nous constatons ici que le jeu de Données affiche une variable cible **déposit** et **deux axes d'analyses** dont le premier axe est sur **le profil des clients** et le deuxième axe est sur **le déroulement de la campagne déjà réalisée** et les retours de cette dernière.")
       st.write("**Description des variables utilisées**")
-      st.write("**AGE** : Variable quantitative qui représente l'âge de la personne.")
-      st.write("**JOB** : Variable catégorielle qui désigne le métier de la personne.")
-      st.write("**MARITAL** : Variable qualitative indiquant le statut matrimonial de la personne.")
-      st.write("**EDUCATION** : Variable qualitative qui annonce le niveau d'études de la personne.")
-      st.write("**DEFAULT** : Variable catégorielle désignant le risque de solvabilité d’un client, cela nous permet de savoir si un client est en défaut de paiement ou pas.")
-      st.write("**BALANCE** : Variable quantitative désignant le solde bancaire de la personne prospectée.")
-      st.write("**HOUSING**: Variable qualitative informant si la personne a un crédit immobilier ou non.")
-      st.write("**LOAN** : Variable catégorielle représentant l'ensemble des clients endettés par un crédit de consommation.")
-      st.write("**CONTACT** : Variable catégorielle désignant la façon dont les clients ont été contacté pendant la campagne marketing précédente.")
-      st.write("**DAY** : Variable quantitative désignant le jour où le client a été contacté pour la dernière fois.")
-      st.write("**MONTH** : Variable catégorielle correspondant au dernier mois ou l’on a contacté le client.")
-      st.write("**DURATION** : Variable quantitative représentant le temps en seconde échangé lors du dernier contact.")
-      st.write("**CAMPAIGN** : Variable quantitative indiquant le nombre de contacts réalisé durant la campagne par individu.")
-      st.write("**PDAYS** : Variable quantitative indiquant le nombre de jours écoulé depuis le dernier contact échangé avec le client (lors de la campagne précédente). Sachant que -1 signifie que le client n’a pas été contacté lors de la campagne précédente")
-      st.write("**PREVIOUS** : Variable quantitative indiquant le nombre de contacts avec le client lors de la campagne précédente.")
-      st.write("**POUTCOME** : Variable catégorielle montrant le résultat de la campagne de marketing précédente.")
+      st.write("**age** : Variable quantitative qui représente l'âge de la personne.")
+      st.write("**job** : Variable catégorielle qui désigne le métier de la personne.")
+      st.write("**marital** : Variable qualitative indiquant le statut matrimonial de la personne.")
+      st.write("**education** : Variable qualitative qui annonce le niveau d'études de la personne.")
+      st.write("**default** : Variable catégorielle désignant le risque de solvabilité d’un client, cela nous permet de savoir si un client est en défaut de paiement ou pas.")
+      st.write("**balance** : Variable quantitative désignant le solde bancaire de la personne prospectée.")
+      st.write("**housing**: Variable qualitative informant si la personne a un crédit immobilier ou non.")
+      st.write("**loan** : Variable catégorielle représentant l'ensemble des clients endettés par un crédit de consommation.")
+      st.write("**contact** : Variable catégorielle désignant la façon dont les clients ont été contacté pendant la campagne marketing précédente.")
+      st.write("**day** : Variable quantitative désignant le jour où le client a été contacté pour la dernière fois.")
+      st.write("**month** : Variable catégorielle correspondant au dernier mois ou l’on a contacté le client.")
+      st.write("**duration** : Variable quantitative représentant le temps en seconde échangé lors du dernier contact.")
+      st.write("**campaign** : Variable quantitative indiquant le nombre de contacts réalisé durant la campagne par individu.")
+      st.write("**pdays** : Variable quantitative indiquant le nombre de jours écoulé depuis le dernier contact échangé avec le client (lors de la campagne précédente). Sachant que -1 signifie que le client n’a pas été contacté lors de la campagne précédente")
+      st.write("**previous** : Variable quantitative indiquant le nombre de contacts avec le client lors de la campagne précédente.")
+      st.write("**poutcome** : Variable catégorielle montrant le résultat de la campagne de marketing précédente.")
   
   #st.header('Visualisation')
   st.markdown('<p class="big-font">Visualisation</p>', unsafe_allow_html=True)
@@ -300,10 +285,10 @@ if page == pages[1] :
           'default' : "'Variable booléenne indiquant si un client est en défaut de paiement (Yes/No). La grande majorité (98,5%) n'est pas en défaut.",
           'housing' : "Variable indiquant la possession d'un crédit immobilier (Yes/No), avec 52,7% des clients sans crédit immobilier et 47,3% en ayant un.",
           'loan' : "Variable booléenne indiquant si un client a des dettes (Yes/No). 86,9% des clients n'ont pas de dette et 13,1% en ont.",
-          'contact' : "Variable catégorisant le mode de contact pendant la campagne en 'cellular', 'unknown', et 'telephone'. 72% ont été contactés par téléphone, et 21% de manière inconnue, possiblement par mail ou en présentiel.",
+          'contact' : "Variable catégorisant le mode de contact pendant la campagne en 'cellular', 'unknown', et 'telephone'. 72% ont été contactés par téléphone, et 21% de manière inconnue, vraisemblablement par mail ou en présentiel.",
           'day' : "Variable représentant le jour du dernier contact avec le client, avec une répartition équilibrée (moyenne et médiane = 15), et des pics d'appels les jours 1, 10, 24, et 31.",
           'month' : "Variable indiquant le dernier mois de contact, avec 12 catégories (jan, feb, mar, ..., nov, dec). Mai est le mois le plus actif (25,3%), suivi par juillet, août, et juin.",
-          'duration' : "Variable mesurant la durée du dernier appel en secondes, une variable quantitative avec une moyenne de 371,99 secondes. Des appels dépassant une heure sont à analyser attentivement.",
+          'duration' : "Variable mesurant la durée du dernier appel en secondes, une variable quantitative avec une moyenne de 371,99 secondes. Des appels dépassants une heure sont à analyser attentivement.",
           'campaign' : "Variable quantifiant le nombre de contacts par client pendant la campagne, variant jusqu'à 36 fois. La majorité a été contactée une seule fois. Un pic à 63 contacts nécessite une analyse approfondie.",
           'pdays' : "Variable représentant le nombre de jours écoulés depuis le dernier contact de la campagne précédente, avec -1 indiquant aucun contact antérieur. La moyenne est de 51,33 jours, mais la médiane à -1 suggère que 50% des clients n'avaient pas été contactés auparavant.",
           'previous' : "Variable indiquant le nombre des contacts lors de la campagne précédente. Avec une majorité de clients (plus de 8000) non contactés auparavant, la moyenne est presque nulle, soulignant un contact rarement répété.",
@@ -318,8 +303,8 @@ if page == pages[1] :
                   st.info(f"Aucun commentaire disponible pour {var}.")
   else:
       st.write("Veuillez sélectionner des variables pour afficher les graphiques et les commentaires associés.")
-  st.write("L'étude sur les profils clients a révélé que la majorité se situe entre 30 et 60 ans, avec une éducation majoritairement au niveau secondaire et un statut matrimonial principalement marié. Les professions sont variées, dominées par les managers, suivis des ouvriers, techniciens et employés administratifs. La plupart des soldes bancaires annuels sont inférieurs à 20 000€. Les prêts immobiliers sont les crédits les plus courants, tandis que les prêts personnels et autres types de crédits sont moins fréquents.")
-  st.write("Il en ressort que les clients ont été plus réceptifs durant l'été, surtout en mai, avec une baisse de contact en septembre, octobre, décembre, et mars. La plupart des contacts ont été faits par téléphone cellulaire. Les interactions avec les clients ont rarement dépassé trois contacts, pour éviter de les agacer. Concernant la variable « poutcome », 74,6% des clients sont classifiés comme « unknown », souvent dû à l'absence de contact antérieur. La variable cible « deposit » montre que 52,6% des clients ont refusé de souscrire, contre 47,4% ayant souscrit. L'analyse a révélé l'importance de toutes les variables, malgré la présence de nombreux outliers et la valeur « unknown » fréquente, qui ne doit pas être supprimée pour éviter la perte de données, surtout pour les nouveaux clients.")
+  st.write("L'étude sur les profils clients a révélé que la majorité se situe entre 30 et 60 ans, avec une éducation majoritaire au niveau secondaire et un statut matrimonial principalement marié. Les professions sont variées, dominées par les managers, suivis des ouvriers, techniciens et employés administratifs. La plupart des soldes bancaires annuels sont inférieurs à 20 000€. Les prêts immobiliers sont les crédits les plus courants, tandis que les prêts personnels et autres types de crédits sont bien moins fréquents.")
+  st.write("Il en ressort que les clients ont été plus réceptifs durant l'été, surtout en mai, avec une baisse de contact en septembre, octobre, décembre, et mars. La plupart des contacts ont été faits par téléphone cellulaire. Les interactions avec les clients ont rarement dépassé trois contacts, pour certainement éviter de les agacer. Concernant la variable « poutcome », 74,6% des clients sont classés comme « unknown », souvent dû à l'absence de contact antérieur. La variable cible « deposit » montre que 52,6% des clients ont refusé de souscrire, contre 47,4% ayant souscrit. L'analyse a révélé l'importance de toutes les variables, malgré la présence de nombreux outliers et la valeur « unknown » fréquente, qui ne doit pas être supprimée pour éviter la perte de données, surtout pour les nouveaux clients.")
 # Analyses des corrélations et tests statistiques
   #st.subheader("Analyse des corrélations avec tests statistiques des variables explicatives")
   st.markdown(
@@ -366,8 +351,8 @@ if page == pages[1] :
 
         # Checkbox pour afficher le commentaire
           if st.checkbox("Afficher le commentaire sur la corrélation numérique", key="Num"):
-              st.markdown("""L'analyse de corrélation montre peu de liens linéaires forts entre la plupart des variables numériques, à l'exception des paires 'pdays' et 'previous', 'age' et 'balance' ainsi que 'campaign' et 'day', qui montrent des corrélations positives notables.
-L'absence de corrélations élevées est favorable pour éviter la multi-collinéarité dans le modèle d'apprentissage automatique.
+              st.markdown("""L'analyse de corrélation montre peu de lien linéaire fort entre la plupart des variables numériques, à l'exception des paires 'pdays' et 'previous', 'age' et 'balance' ainsi que 'campaign' et 'day', qui montrent des corrélations positives notables.
+L'absence de corrélations élevées est favorable pour éviter la multicolinéarité dans le modèle d'apprentissage automatique.
 """)
 
       elif choice == "Corr Catégorielle":
@@ -395,7 +380,7 @@ L'absence de corrélations élevées est favorable pour éviter la multi-collin�
 
         # Checkbox pour afficher le commentaire
           if st.checkbox("Afficher le commentaire sur la corrélation catégorielle", key="cat"):
-              st.markdown("""la plupart des variables catégorielles dans notre ensemble de données sont interdépendantes, bien que certaines paires, telles que 'marital' et 'default', 'education' et 'default', 'default' et 'housing', ainsi que 'loan' et 'contact', ne montrent pas de dépendance significative. La majorité des tests indiquent des p-values inférieures à 5%, justifiant le rejet de l'indépendance entre ces variables catégorielles.
+              st.markdown("""la plupart des variables catégorielles dans notre ensemble de données sont inter-dépendantes, bien que certaines paires, telles que 'marital' et 'default', 'education' et 'default', 'default' et 'housing', ainsi que 'loan' et 'contact', ne montrent pas de dépendances significatives. La majorité des tests indiquent des p-values inférieures à 5%, justifiant le rejet de l'indépendance entre ces variables catégorielles.
                             """)
 
       elif choice == "Corr Num-Cat":
@@ -426,7 +411,7 @@ L'absence de corrélations élevées est favorable pour éviter la multi-collin�
 
         # Checkbox pour afficher le commentaire
           if st.checkbox("Afficher le commentaire sur la Corrélation Numérique-Catégorielle", key="Num-Cat"):
-              st.markdown("""La majorité des tests ont révélé des relations statistiquement significatives. Des exceptions notables concernent certaines interactions impliquant le jour du dernier contact, bien que quelques-unes d'entre elles, notamment avec le mois du contact, le résultat de la campagne précédente, et la variable cible 'deposit', aient montré une significativité statistique élevée.
+              st.markdown("""La majorité des tests ont révélé des relations statistiquemment significatives. Des exceptions notables concernent certaines interactions impliquant le jour du dernier contact, bien que quelques-unes d'entre elles, notamment avec le mois du contact, le résultat de la campagne précédente, et la variable cible 'deposit', aient montré une significativité statistique élevée.
 Nous avons décidé d'un commun accord le maintien de la variable 'day' dans notre analyse.
 """)
 
@@ -440,7 +425,7 @@ Nous avons décidé d'un commun accord le maintien de la variable 'day' dans not
     'pdays' : "Les clients contactés après une longue période (999 jours suggèrent une absence de contact antérieur) souscrivent moins. Ceux contactés plus récemment sont plus enclins à souscrire, mettant en lumière l'importance de contacts réguliers.",
     'default' : "La corrélation entre 'default' et la souscription est modeste (inférieure à 0,5). Les clients en défaut de paiement semblent moins intéressés par les dépôts à terme, probablement en raison de contraintes financières.",
     'campaign' : "La souscription est maximale quand les clients sont contactés 1 à 3 fois. Au-delà, la probabilité de souscrire diminue, indiquant une saturation dans les efforts de communication.",
-    'duration' : "La durée de l'appel est un indicateur clé de souscription, avec des appels plus longs corrélant avec une plus grande probabilité de souscription.",
+    'duration' : "La durée de l'appel est un indicateur clé de souscription, avec des appels plus longs corrélants avec une plus grande probabilité de souscription.",
    'day' : "La distribution des souscriptions est relativement uniforme sur le mois, malgré de légères variations qui méritent une analyse plus poussée pour optimiser le timing des contacts.",
     'poutcome' : "Les clients avec un résultat positif ('success') dans la campagne précédente sont beaucoup plus susceptibles de souscrire à nouveau, soulignant l'importance d'une relation client positive et continue.",
     'month' : "Mai est le mois le plus actif en termes de contact, mais Mars, Décembre, Octobre et Septembre se distinguent par une plus haute réussite de souscription, indiquant une saisonnalité dans l'efficacité des campagnes.",
@@ -519,7 +504,7 @@ if page == pages[1]:
     # Checkbox pour la première partie (Test statistique du Chi Carré)
   if st.checkbox("Test statistique du Chi Carré"):
      st.markdown("""
-    Afin d'évaluer l'impact des variables catégorielles sur la variable cible, nous avons mis en œuvre le test du chi carré. Cette méthode statistique est conçue pour déterminer l'existence d'une corrélation entre deux variables catégorielles. Nos résultats montrent que les valeurs des statistiques de test pour chaque variable catégorielle sont significativement inférieures au seuil de 5%. Cela nous amène à rejeter l'hypothèse nulle, qui postule l'indépendance entre les variables catégorielles et la variable cible (dépôt à terme). Par conséquent, nous concluons que ces variables exercent une influence notable sur la décision des clients de souscrire ou non à un dépôt à terme
+    Afin d'évaluer l'impact des variables catégorielles sur la variable cible, nous avons mis en œuvre le test du chi carré. Cette méthode statistique est conçue pour déterminer l'existence d'une corrélation entre deux variables catégorielles. Nos résultats montrent que les valeurs des statistiques de test pour chaque variable catégorielle sont significativement inférieures au seuil de 5%. Cela nous amène à rejeter l'hypothèse nulle, qui postule l'indépendance entre les variables catégorielles et la variable cible (dépôt à terme). Par conséquent, nous concluons que ces variables exercent une influence notable sur la décision des clients de souscrire ou non à un dépôt à terme.
     """)
      cat_features = ['job', 'marital', 'education', 'default', 'housing', 'loan', 'contact', 'month', 'poutcome', 'deposit']
      chi2_p_values = {}
@@ -807,7 +792,7 @@ if page == pages[2]:
     st.write("#### B - Quelques visualisations pour notre preprocessing")
 
     # On cree la variable du checkboxe
-    show_boxplots = st.checkbox("Visualisez les boxplots des variables affichant des valeurs extrêmes et abérantes avant leurs traitements")
+    show_boxplots = st.checkbox("Visualisez les boxplots des variables affichant des valeurs extrêmes et abérrantes avant leurs traitements")
     
     # On ajoute un séparateur entre les boxplots et le tableau
     st.markdown("---")
@@ -869,8 +854,8 @@ if page == pages[2]:
 
 
     #st.write("### Machine Learning")
-    st.write("#### Nous avons entrainé et testé les models suivants :")
-    st.write("**- Regression Logistique**")
+    st.write("#### Nous avons entraîné et testé les modèles suivants :")
+    st.write("**- Régression Logistique**")
     st.write("**- KNN**")
     st.write("**- Decision Tree**")
     st.write("**- Random Forest**")
@@ -919,8 +904,8 @@ if page == pages[2]:
                                                                 train_sizes=np.linspace(.1, 1.0, 5))
 
         # On affiche le composant select pour choisir le metric desiré
-        selected_metric = st.selectbox("Sélectionnez une métrique d'evaluation du modèle choisi",
-                                       options=['-- Sélectionnez une métric --', 'Learning Curve', 'Confusion Matrix', 'Classification Report', 'ROC Curve'])
+        selected_metric = st.selectbox("Sélectionnez une métrique d'évaluation du modèle choisi",
+                                       options=['-- Sélectionnez une métrique --', 'Learning Curve', 'Confusion Matrix', 'Classification Report', 'ROC Curve'])
 
         # On affiche l'information choisie
         if selected_metric == 'Learning Curve':
@@ -955,8 +940,8 @@ if page == pages[2]:
             else:
                 st.warning("This option is only available for classifiers that support predict_proba (e.g., Logistic Regression).")
 
-        with st.expander("Observation"):
-            highlighted_text = "Ceci est un texte de test, à votre avis serait-il pertinent de faire de petites observations comme ceci pour chaque evaluation ?"
+        
+            
         # Colored box avec mise en avant du texte
             colored_box = f'<div style="background-color:#ADD8E6; padding:10px; border-radius:5px;">{highlighted_text}</div>'
         # On affiche le Colored box avec mise en avant du texte
@@ -972,8 +957,8 @@ if page == pages[2]:
                                                                 train_sizes=np.linspace(.1, 1.0, 5))
 
         # On affiche le composant select pour choisir le metric desiré
-        selected_metric = st.selectbox("Sélectionnez une métrique d'evaluation du modèle choisi",
-                                       options=['-- Sélectionnez une métric --', 'Learning Curve', 'Confusion Matrix', 'Classification Report'])
+        selected_metric = st.selectbox("Sélectionnez une métrique d'évaluation du modèle choisi",
+                                       options=['-- Sélectionnez une métrique --', 'Learning Curve', 'Confusion Matrix', 'Classification Report'])
 
         if selected_metric == 'Learning Curve':
             st.pyplot(plot_learning_curve(train_sizes, train_scores, test_scores, model_choisi))
@@ -1013,8 +998,8 @@ if page == pages[2]:
             
 
         # On affiche le composant select pour choisir le metric desiré
-        selected_metric = st.selectbox("Sélectionnez une métrique d'evaluation du modèle choisi",
-                                       options=['-- Sélectionnez une métric --', 'Learning Curve', 'Confusion Matrix', 'Classification Report', 'Decision Tree'])
+        selected_metric = st.selectbox("Sélectionnez une métrique d'évaluation du modèle choisi",
+                                       options=['-- Sélectionnez une métrique --', 'Learning Curve', 'Confusion Matrix', 'Classification Report', 'Decision Tree'])
 
         if selected_metric == 'Decision Tree':
             if model_choisi == 'Decision Tree':
@@ -1024,7 +1009,7 @@ if page == pages[2]:
                               class_names=["No", "Yes"], rounded=True)
                     st.pyplot(plt.gcf())
                 else:
-                    st.warning("Cette option n'est possible que pour le Model Decision Tree.")
+                    st.warning("Cette option n'est possible que pour le modèle Decision Tree.")
 
         elif selected_metric == 'Learning Curve':
             st.pyplot(plot_learning_curve(train_sizes, train_scores, test_scores, model_choisi))
@@ -1053,8 +1038,8 @@ if page == pages[2]:
                                                                     train_sizes=np.linspace(.1, 1.0, 5))
 
         # On affiche la metric a selectionner
-            selected_metric = st.selectbox("Sélectionnez une métrique d'evaluation du modèle choisi", 
-                                           options=['-- Sélectionnez une métric --', 'Learning Curve', 'Confusion Matrix', 'Classification Report'])
+            selected_metric = st.selectbox("Sélectionnez une métrique d'évaluation du modèle choisi", 
+                                           options=['-- Sélectionnez une métrique --', 'Learning Curve', 'Confusion Matrix', 'Classification Report'])
 
             if selected_metric == 'Learning Curve':
                 st.pyplot(plot_learning_curve(train_sizes, train_scores, test_scores, model_choisi))
@@ -1087,8 +1072,8 @@ if page == pages[2]:
                                                             train_sizes=np.linspace(.1, 1.0, 5))
 
     # On affiche la metric a selectionner
-      selected_metric = st.selectbox("Sélectionnez une métrique d'evaluation du modèle choisi", 
-                                     options=['-- Sélectionnez une métric --', 'Learning Curve', 'Confusion Matrix', 'Classification Report'])
+      selected_metric = st.selectbox("Sélectionnez une métrique d'évaluation du modèle choisi", 
+                                     options=['-- Sélectionnez une métrique --', 'Learning Curve', 'Confusion Matrix', 'Classification Report'])
 
       if selected_metric == 'Learning Curve':
         st.pyplot(plot_learning_curve(train_sizes, train_scores, test_scores, model_choisi))
@@ -1130,7 +1115,7 @@ if page == pages[3] :
         """,
         unsafe_allow_html=True
     )
-  st.markdown('<p class="big-font">Prédictions</p>', unsafe_allow_html=True)  
+  st.markdown('<p class="big-font">Prédiction pour un Conseiller Bancaire</p>', unsafe_allow_html=True)  
   #st.header("Prédictions")
   df = pd.read_csv('bank.csv')
     #On écarte les valeurs -1 de pdays pour ne pas les traiter lors du pre-processing
@@ -1144,7 +1129,7 @@ if page == pages[3] :
     le mois, l'éducation etc. à partir d'un DataFrame nommé df.")
     st.write("Pour chaque attribut sélectionné, le script crée une colonne correspondante dans un autre DataFrame \
     encoded_data.")
-    st.write("La catégorie choisir reçoit la valeur 1, tandis que toutes les autres catégories reçoivent la valeur 0.")
+    st.write("La catégorie choisit reçoit la valeur 1, tandis que toutes les autres catégories reçoivent la valeur 0.")
     st.write("- ***Préparation des données complémentaires :***")
     st.write("Le script assigne automatiquement des valeurs par défaut à certaines colonnes, telles que age_group et \
     balance_group, basées sur des catégories pré-établies. Il utilise également des statistiques descriptives telles que \
@@ -1155,7 +1140,7 @@ if page == pages[3] :
     st.write("- ***Processus de Prédiction :***")
     st.write("Lorsque l'utilisateur clique sur le bouton 'Prédictions', le modèle génère une prédiction basée sur les données \
     entrées. Le modèle XGBoost, utilisé pour la prédiction, fournit des probabilités pour une classification binaire.")
-    st.write("Un seuil spécifique, comme 0.5, est appliqué pour déterminer la classe prédite.")
+    st.write("Un seuil spécifique, comme 0.65, est appliqué pour déterminer la classe prédite.")
   
   pdays_filtered = df['pdays'][df['pdays'] != -1]
     # Pour 'campaign'
@@ -1198,59 +1183,59 @@ if page == pages[3] :
     # Charger le modèle
   encoded_data = pd.DataFrame(index=[0])
     
-  job = st.selectbox('Job', df['job'].unique())
+  job = st.selectbox('Sélectionner le type de métier', df['job'].unique())
   encoded_data['job_' + job] = 1
 # Remplir les autres colonnes de la DataFrame encodée avec des zéros
   for job_category in df['job'].unique():
       if job_category != job:
           encoded_data['job_' + job_category] = 0
-  month = st.selectbox('Month', df['month'].unique())
+  month = st.selectbox('Sélectionner le mois de contact', df['month'].unique())
   encoded_data['month_' + month] = 1
 # Remplir les autres colonnes de la DataFrame encodée avec des zéros
   for month_category in df['month'].unique():
       if month_category != month:
           encoded_data['month_' + month_category] = 0
             
-  education = st.selectbox('Education', df['education'].unique())
+  education = st.selectbox('Sélectionner le niveau scolaire', df['education'].unique())
   encoded_data['education_' + education] = 1
 # Remplir les autres colonnes de la DataFrame encodée avec des zéros
   for education_category in df['education'].unique():
       if education_category != education:
           encoded_data['education_' + education_category] = 0
-  default = st.selectbox('Default', df['default'].unique())
+  default = st.selectbox('Sélectionner si le client est solvable', df['default'].unique())
   encoded_data['default_' + default] = 1
 # Remplir les autres colonnes de la DataFrame encodée avec des zéros
   for default_category in df['default'].unique():
       if default_category != default:
           encoded_data['default_' + default_category] = 0
             
-  marital = st.selectbox('Marital', df['marital'].unique())
+  marital = st.selectbox('Sélectionner le statut marital', df['marital'].unique())
   encoded_data['marital_' + marital] = 1
 # Remplir les autres colonnes de la DataFrame encodée avec des zéros
   for marital_category in df['marital'].unique():
       if marital_category != marital:
           encoded_data['marital_' + marital_category] = 0
             
-  housing = st.selectbox('Housing', df['housing'].unique())
+  housing = st.selectbox('Sélectionner si un crédit immobilier en cours', df['housing'].unique())
   encoded_data['housing_' + housing] = 1
 # Remplir les autres colonnes de la DataFrame encodée avec des zéros
   for housing_category in df['housing'].unique():
       if housing_category != housing:
           encoded_data['housing_' + housing_category] = 0
-  loan = st.selectbox('Loan', df['loan'].unique())
+  loan = st.selectbox('Sélectionner si un crédit de consommation en cours', df['loan'].unique())
   encoded_data['loan_' + loan] = 1
 # Remplir les autres colonnes de la DataFrame encodée avec des zéros
   for loan_category in df['loan'].unique():
       if loan_category != loan:
           encoded_data['loan_' + loan_category] = 0
             
-  contact = st.selectbox('Contact', df['contact'].unique())
+  contact = st.selectbox('Sélectionner quel moyen de prise de contact', df['contact'].unique())
   encoded_data['contact_' + contact] = 1
 # Remplir les autres colonnes de la DataFrame encodée avec des zéros
   for contact_category in df['contact'].unique():
       if contact_category != contact:
           encoded_data['contact_' + contact_category] = 0
-  poutcome = st.selectbox('poutcome', df['poutcome'].unique())
+  poutcome = st.selectbox('Sélectionner le résultat de la campagne marketing précédente', df['poutcome'].unique())
   encoded_data['poutcome_' + poutcome] = 1
 # Remplir les autres colonnes de la DataFrame encodée avec des zéros
   for poutcome_category in df['poutcome'].unique():
@@ -1277,7 +1262,7 @@ if page == pages[3] :
 }
   age_options = {k: v for k, v in column_mapping.items()}
 # Sélectionner la catégorie de "age_group" choisie par l'utilisateur
-  selected_age_group = st.selectbox('Sélectionnez la catégorie de "age_group"', list(age_options.keys()))
+  selected_age_group = st.selectbox('Sélectionner la catégorie de tranches d\'âge', list(age_options.keys()))
     
 # Récupérer le nom de la colonne encodée correspondant à la valeur sélectionnée
     #encoded_data[selected_age_group] = 0
@@ -1294,7 +1279,7 @@ if page == pages[3] :
   balance_options = {k: v for k, v in column_mapping_balance.items()}
 # Sélectionner la catégorie de "balance_group" choisie par l'utilisateur à partir des options inversées
     
-  selected_balance_group = st.selectbox('Sélectionnez la catégorie de "balance_group"', list(balance_options.keys()))
+  selected_balance_group = st.selectbox('Sélectionner la catégorie de soldes bancaires annuels', list(balance_options.keys()))
 # Créer une nouvelle colonne dans encoded_data pour la catégorie sélectionnée
   selected_balance_column = column_mapping_balance[selected_balance_group]
   encoded_data[selected_balance_column] = 1
@@ -1347,6 +1332,7 @@ if page == pages[3] :
        # st.markdown("**La prédiction est : Yes**")
    # else:
        # st.mardown("**La prédiction est : No**")
+
 if page == pages[4] :
   st.markdown(
         """
@@ -1371,7 +1357,7 @@ if page == pages[4] :
         """,
         unsafe_allow_html=True
     )
-  st.markdown('<p class="big-font">Utilisation professionnelle du projet</p>', unsafe_allow_html=True)
+  st.markdown('<p class="big-font">Prédiction pour le Marketing Téléphonique</p>', unsafe_allow_html=True)
   #st.header("Utilisation professionnelle du projet")
   df = pd.read_csv('Banktest.csv')
   
@@ -1402,6 +1388,23 @@ if page == pages[4]:
     st.write("- Tri : Organisation du DataFrame 'df' par ordre décroissant de probabilité.")
     st.write("- Sélection des Données : Réduction du DataFrame trié pour ne conserver que les colonnes 'Prénom', 'Téléphone' et 'Probability'.")
     st.write("- Affichage : Présentation des 50 premiers clients avec st.dataframe(df_sorted.head(50)), dans l'application Streamlit.")
+  st.markdown(
+        """
+        <style>
+            .highlight {
+                background-color: #F0F8FF;  /* Alice Blue */
+                padding: 15px;
+                border-radius: 8px;
+                text-align: center;
+                font-size: 24px;
+            }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+    # Text with adjusted styling
+  st.markdown('<p class="highlight">Nouveau dataset</p>', unsafe_allow_html=True)
   st.dataframe(df)
   def calculate_outlier_bounds(df, column):
         Q1 = df[column].quantile(0.25)
@@ -1487,80 +1490,77 @@ if page == pages[4]:
   df_sorted1 = df_sorted
   df_sorted = df_sorted[['prénom', 'téléphone','probability']]
 # Display the top 50 clients
-  st.dataframe(df_sorted.head(50))
+  if st.checkbox('Afficher les 50 clients avec la probabilité la plus forte'):
+    st.dataframe(df_sorted.head(50))
   prediction = model.predict(encoded_df)
 # Créer un histogramme des probabilités
-  fig, ax = plt.subplots()
-  ax.hist(prediction, bins=10, range=(0,1))
-  ax.set_title("Distribution des Probabilités de Prédiction")
-  ax.set_xlabel("Probabilité")
-  ax.set_ylabel("Nombre de Prédictions")
+  #fig, ax = plt.subplots()
+  #ax.hist(prediction, bins=10, range=(0,1))
+  #ax.set_title("Distribution des Probabilités de Prédiction")
+  #ax.set_xlabel("Probabilité")
+  #ax.set_ylabel("Nombre de Prédictions")
 
     # Afficher l'histogramme dans Streamlit
-  st.pyplot(fig)
+  #st.pyplot(fig)
 # Filtrer le DataFrame pour ne garder que les lignes avec probability > 0.5
   filtered_df1 = df_sorted1.drop(columns=['prénom', 'téléphone'])
   filtered_df = filtered_df1[filtered_df1['probability'] > 0.5]
 
 # Obtenir le résumé statistique du DataFrame filtré
-  summary = filtered_df.describe()
+  #summary = filtered_df.describe()
 
-# Afficher le résumé
-  st.write(summary)
-
-if page == pages[5]:
-   #intégration code
-    df = pd.read_csv('bank.csv')
-    def calculate_outlier_bounds(df, column):
+if page == pages[5] :
+  df = pd.read_csv('bank.csv')
+  def calculate_outlier_bounds(df, column):
         Q1 = df[column].quantile(0.25)
         Q3 = df[column].quantile(0.75)
         IQR = Q3 - Q1
         return Q1 - 1.5 * IQR, Q3 + 1.5 * IQR
-    def replace_outliers_with_mean(df, column, upper_bound):
+  def replace_outliers_with_mean(df, column, upper_bound):
         mean_value = df[column].mean()
         df.loc[df[column] > upper_bound, column] = mean_value
-    def encode_categorical_features(df, categorical_columns):
+  def encode_categorical_features(df, categorical_columns):
         encoder = OneHotEncoder(drop=None, sparse=False)
         encoder.fit(df[categorical_columns])
         encoded_df_2 = encoder.transform(df[categorical_columns])
         encoded_df = pd.DataFrame(encoded_df_2, columns=encoder.get_feature_names_out(categorical_columns))
         return encoded_df
-    columns_to_convert = ['day', 'duration', 'campaign', 'pdays', 'previous']
-    for column in columns_to_convert:
+  columns_to_convert = ['day', 'duration', 'campaign', 'pdays', 'previous']
+  for column in columns_to_convert:
         df[column] = df[column].astype(int)
-    if 'pdays' not in df:
+  if 'pdays' not in df:
         st.write("XDLa colonne 'pdays' a disparu!")
-    if 'pdays' not in df:
+  if 'pdays' not in df:
         st.write("VLa colonne 'pdays' a disparu!")
     # Filter for pdays column
-    pdays_filtered = df['pdays'][df['pdays'] != -1]
-    if 'pdays' not in df:
+  pdays_filtered = df['pdays'][df['pdays'] != -1]
+  if 'pdays' not in df:
         st.write("XLa colonne 'pdays' a disparu!")
     # Calculate outlier bounds for the respective columns
-    _, upper_campaign = calculate_outlier_bounds(df, 'campaign')
-    _, upper_pdays = calculate_outlier_bounds(df, 'pdays')
-    _, upper_previous = calculate_outlier_bounds(df, 'previous')
-    _, upper_duration = calculate_outlier_bounds(df, 'duration')
-    if 'pdays' not in df:
+  _, upper_campaign = calculate_outlier_bounds(df, 'campaign')
+  _, upper_pdays = calculate_outlier_bounds(df, 'pdays')
+  _, upper_previous = calculate_outlier_bounds(df, 'previous')
+  _, upper_duration = calculate_outlier_bounds(df, 'duration')
+  if 'pdays' not in df:
         st.write("6La colonne 'pdays' a disparu!")
     # Replace outliers with mean
-    replace_outliers_with_mean(df, 'pdays', upper_pdays)
-    replace_outliers_with_mean(df, 'campaign', upper_campaign)
-    replace_outliers_with_mean(df, 'previous', upper_previous)
-    replace_outliers_with_mean(df, 'duration', upper_duration)
+  replace_outliers_with_mean(df, 'pdays', upper_pdays)
+  replace_outliers_with_mean(df, 'campaign', upper_campaign)
+  replace_outliers_with_mean(df, 'previous', upper_previous)
+  replace_outliers_with_mean(df, 'duration', upper_duration)
     # Bin 'age' and 'balance' columns
-    age_bins = [18, 25, 35, 50, 65, 100]
-    age_labels = ["18_25", "25_35", "35_50", "50_65", "65_100"]
-    df['age_group'] = pd.cut(df['age'], bins=age_bins, labels=age_labels, right=False).astype('object')
-    balance_bins = [-6848, 0, 122, 550, 1708, 81205]
-    balance_labels = ["negatif", "tres_faible", "faible", "moyen", "eleve"]
-    df['balance_group'] = pd.cut(df['balance'], bins=balance_bins, labels=balance_labels, right=False).astype('object')
+  age_bins = [18, 25, 35, 50, 65, 100]
+  age_labels = ["18_25", "25_35", "35_50", "50_65", "65_100"]
+  df['age_group'] = pd.cut(df['age'], bins=age_bins, labels=age_labels, right=False).astype('object')
+  balance_bins = [-6848, 0, 122, 550, 1708, 81205]
+  balance_labels = ["negatif", "tres_faible", "faible", "moyen", "eleve"]
+  df['balance_group'] = pd.cut(df['balance'], bins=balance_bins, labels=balance_labels, right=False).astype('object')
     # Encode categorical columns
-    categorical_columns = df.select_dtypes(include=['object']).columns
-    encoded_df = encode_categorical_features(df, categorical_columns)
-    columns_to_add = ['day', 'duration', 'campaign', 'pdays', 'previous']
-    encoded_df = pd.concat([df[columns_to_add], encoded_df], axis=1)
-    cols = [
+  categorical_columns = df.select_dtypes(include=['object']).columns
+  encoded_df = encode_categorical_features(df, categorical_columns)
+  columns_to_add = ['day', 'duration', 'campaign', 'pdays', 'previous']
+  encoded_df = pd.concat([df[columns_to_add], encoded_df], axis=1)
+  cols = [
     "day", "duration", "campaign", "pdays", "previous", "job_admin.", "job_blue-collar", "job_entrepreneur", "job_housemaid",
     "job_management", "job_retired", "job_self-employed", "job_services", "job_student", "job_technician", "job_unemployed",
     "job_unknown", "marital_divorced", "marital_married", "marital_single", "education_primary", "education_secondary",
@@ -1571,17 +1571,17 @@ if page == pages[5]:
     "age_group_35_50", "age_group_50_65", "age_group_65_100", "balance_group_eleve", "balance_group_faible",
     "balance_group_moyen", "balance_group_negatif", "balance_group_tres_faible"
 ]
-    encoded_df = encoded_df[cols]
-    with open('xgb_optimizedpickle', 'rb') as model_file:
+  encoded_df = encoded_df[cols]
+  with open('xgb_optimizedpickle', 'rb') as model_file:
         model = pickle.load(model_file)
-    y_pred = model.predict(encoded_df)
-    df['prediction'] = y_pred
+  y_pred = model.predict(encoded_df)
+  df['prediction'] = y_pred
     #df_sorted = df.sort_values(by='prediction', ascending=False)
-    y_proba = model.predict_proba(encoded_df)
-    df['probability'] = y_proba[:,1]  # Pour une classification binaire, cela donnerait la probabilité de la classe 1
-    filtered_df = df.sort_values(by='probability', ascending=False)
+  y_proba = model.predict_proba(encoded_df)
+  df['probability'] = y_proba[:,1]  # Pour une classification binaire, cela donnerait la probabilité de la classe 1
+  filtered_df = df.sort_values(by='probability', ascending=False)
 # Display the top 50 clients
-    st.markdown(
+  st.markdown(
         """
         <style>
             .big-font {
@@ -1604,49 +1604,17 @@ if page == pages[5]:
         """,
         unsafe_allow_html=True
     )
-    st.markdown('<p class="big-font">DataFrame avec probabilité de conversion</p>', unsafe_allow_html=True)
-    st.dataframe(filtered_df.head(50))
-    prediction = model.predict(encoded_df)
-# Créer un histogramme des probabilités
-    
-    fig, ax = plt.subplots()
-    ax.hist(prediction, bins=10, range=(0,1))
-    ax.set_title("Distribution des Probabilités de Prédiction")
-    ax.set_xlabel("Probabilité")
-    ax.set_ylabel("Nombre de Prédictions")
-    # Afficher l'histogramme dans Streamlit
-    st.markdown(
-        """
-        <style>
-            .big-font {
-                font-size: 32px !important;
-                color: #1E90FF;  /* Dodger Blue */
-                text-align: center;
-            }
-            .highlight {
-                padding: 20px;
-                border-radius: 8px;
-                text-align: center;
-            }
-            .section {
-                background-color: #F0F8FF;  /* Alice Blue */
-                padding: 30px;
-                border-radius: 20px;
-                text-align: center;
-            }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-    st.markdown('<p class="big-font">Histogramme des probabilités</p>', unsafe_allow_html=True)
-    st.pyplot(fig)
-# Filtrer le DataFrame pour ne garder que les lignes avec probability > 0.5
-    filtered_df = filtered_df[filtered_df['probability'] > 0.65]
+  st.markdown('<p class="big-font">Conclusion</p>', unsafe_allow_html=True)
+  #st.dataframe(filtered_df.head(50))
+  prediction = model.predict(encoded_df)
+
+# Filtrer le DataFrame pour ne garder que les lignes avec probability > 0.65
+  filtered_df = filtered_df[filtered_df['probability'] > 0.65]
 # Obtenir le résumé statistique du DataFrame filtré
-    summary = filtered_df.describe()
-    summary2 = filtered_df.describe(include=['object', 'category'])
+  summary = filtered_df.describe()
+  summary2 = filtered_df.describe(include=['object', 'category'])
 # Afficher le résumé
-    st.markdown(
+  st.markdown(
         """
         <style>
             .big-font {
@@ -1669,79 +1637,92 @@ if page == pages[5]:
         """,
         unsafe_allow_html=True
     )
-    st.markdown('<p class="big-font">Résultat des profils à démarcher</p>', unsafe_allow_html=True)
-    st.write(summary)
-    st.write(summary2)
-    with st.container():
+  #st.write(summary)
+  #st.write(summary2)
+  st.markdown(
+        """
+        <style>
+            .highlight {
+                background-color: #F0F8FF;  /* Alice Blue */
+                padding: 15px;
+                border-radius: 8px;
+                text-align: center;
+                font-size: 24px;
+            }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+  st.markdown('<p class="highlight">Recherche des profils optimaux</p>', unsafe_allow_html=True)
+  columns_to_exclude = ['age', 'balance', 'deposit']
+  filtered_df_excluded = filtered_df.drop(columns=columns_to_exclude, errors='ignore')
+  summary_excluded = summary.drop(columns=columns_to_exclude, errors='ignore')
+  summary2_excluded = summary2.drop(columns=columns_to_exclude, errors='ignore')
+
+# Ajouter une checkbox dans l'application Streamlit pour afficher les DataFrames modifiés
+  if st.checkbox('Afficher les DataFrames'):
+    st.write("Dataframe contenant les clients avec une probabilité de souscription supérieur à 65%")
+    st.dataframe(filtered_df_excluded.head(50))
+    st.write("Affichage des descriptions globales du dataframe")
+    st.write(summary_excluded)
+    st.write(summary2_excluded)
+  with st.container():
         selected_vars = st.multiselect('Sélectionnez les variables à visualiser:', filtered_df.columns)
-        show_annotations = st.checkbox('Afficher les commentaires')
-    if selected_vars:
+        #show_annotations = st.checkbox('Afficher les commentaires')
+  if selected_vars:
         fig = create_visualisations(filtered_df, selected_vars)
         st.plotly_chart(fig)
-
-        if show_annotations:
-            st.header("commentaire de la variable selectionnée")
+  #if show_annotations:
+        #st.header("commentaire de la variable selectionnée")
             #dictionnaire des commentaires pour chaque variable
-            commentpred= {
-            'job' : "La majorité des individus du seuil de probabilité sont des managers, suivie des techniciens et des ouvriers. néanmoint il y a une très bonne répartition avec le reste des metiers",
-          'age' : "les individus avec une probabilité de souscription supérieur à 0,6, ont des âges variant entre 18 à 95 ans avec une moyenne de 38 ans. La moitié des individus a 39 ans ou moins. La majorité des personnes qui accepte le dépot à terme se situe entre 30 et 34 ans.",
-          'marital' : "le statut matrimonial des clients de notre seuil de probabilité de souscription est : 'married' (2570), suivi des 'single' (1830) puis des 'divorced' (586).",
-          'education' : "le niveau d'études majoritaire est le secondaire pour les clients qui souscrivent le plus suivi des terciaires, des primaires et enfin des unknown (indique une non-disclosure ou l'absence d'éducation formelle.)",
-          'balance' : "la majorité des clients qui souscrivent le plus suivant le seuil de probabilité ont des soldes bancaires qui varient entre 0 et 5000 K avec des extrêmes aussi.",
+  commentpred= {
+          'job' : "La majorité des individus du seuil de probabilité sont les managers, suivis par les techniciens et les ouvriers. Néanmoins, il y a une très bonne répartition avec le reste des metiers",
+          'age' : "Les individus avec une probabilité de souscription supérieure à 0,65 ont des âges variant entre 18 et 95 ans avec une moyenne de 38 ans. La moitié des individus a moins de 39 ans. La majorité des personnes qui accepte le dépot à terme se situe entre 30 et 34 ans.",
+          'marital' : "Le statut matrimonial des clients de notre seuil de probabilité de souscription est : 'married' (2570), suivi des 'single' (1830) puis des 'divorced' (586).",
+          'education' : "Le niveau d'études majoritaire est le secondaire pour les clients qui souscrivent le plus à un dépôt à terme, suivis par le niveau tertiaire, le primaire et enfin des unknown (indique une non-divulgation ou l'absence d'éducation formelle.)",
+          'balance' : "La majorité des clients qui souscrivent le plus suivant le seuil de probabilité ont des soldes bancaires qui varient entre 0 et 5000 K avec également des montants plus extrêmes",
           'default' : "La majorité des clients du seuil de probabilité n'est pas en défaut de paiement.",
-          'housing' : "les personnes n'ayant pas de crédit immobilier souscrivent plus que ceux qui en ont en fonction du seuil de probabilité choisi.",
-          'loan' : "la plus part des clients du seuil n'ont pas de dette.",
-          'contact' : "suivant le seuil il est fortement recommandé de contacter les clients par téléphone portable.",
-          'day' : "le jour le plus propice pour obtenir des souscriptions suivant le seuil est entre le 12 et le 15 du mois, mais il faut noté que cette variable est casi constante.",
-          'month' : "Mai est le mois avec le plus de souscription suivant le seuil de probabilité, suivi par août, juillet, avril et juin.",
-          'duration' : "la durée d'appel des personnes qui souscrivent suivant le seuil est d'environ 7 min soit 454 secondes.",
-          'campaign' : "Les clients qui souscrivent suivant le seuil de probabilité ont été contactée une seule fois. et au plus 6 fois seulement",
-          'pdays' : "les clients n'ayant jamais été démarché lors des campagnes précédentes, avec -1 indiquant aucun contact antérieur sont plus susceptible de souscrire suivant le seuil de probabilité, avec un pic pour ceux qui avaient été contacté il y a 50 jours",
-          'previous' : "les clients n'ayant été jamais contactés auparavant sont les plus représenté par le seuil de souscription, avec ceux ayant été contacté soit 1 ou 2 fois.",
-          'poutcome' : "ayant constaté qu'il y'avait un grand nombre de personne qui n'ont jamais été contacté, on se rend compte que se sont ces personnes qui souscrivent le plus suivi de ceux qui avaient déjà souscrit avant avec quelque un qui avait refusé de souscrire.",
+          'housing' : "Les souscripteurs de comptes à terme n'ont majoritairement pas de crédit immobilier en fonction du seuil de probabilité choisi.",
+          'loan' : "La plupart des clients du seuil n'ont pas de dettes.",
+          'contact' : "Suivant le seuil, il est fortement recommandé de contacter les clients sur leur téléphone portable.",
+          'day' : "Le jour le plus propice pour obtenir des souscriptions suivant le seuil est entre le 12 et le 15 du mois, mais il faut noter que cette variable est quasiment constante.",
+          'month' : "Le mois de Mai détient le plus de souscription suivant le seuil de probabilité, suivi par août, juillet, avril et juin.",
+          'duration' : "La durée d'appel des personnes qui souscrivent suivant le seuil est d'environ 7min soit 454 secondes.",
+          'campaign' : "Les clients qui souscrivent suivant le seuil de probabilité ont été contactés une seule fois et au plus 6 fois seulement",
+          'pdays' : "Les clients n'ayant jamais été démarché lors des campagnes précédentes, avec -1 indiquant aucun contact antérieur, sont plus susceptibles de souscrire suivant le seuil de probabilité, avec un pic pour ceux qui avaient été contacté il y a 50 jours",
+          'previous' : "Les clients n'ayant jamais été contacté auparavant sont les plus représentés par le seuil de souscription, avec ceux ayant été contacté une ou 2 fois.",
+          'poutcome' : "Ayant constaté qu'il y'avait un grand nombre de personne qui n'ont jamais été contacté, nous nous rendons compte que ce sont ces personnes qui souscrivent le plus, suivi par ceux qui avaient déjà souscrit auparavant, et en comptant quelques personnes qui avaient refusé de souscrire.",
           }
-        #affichage 
-            for var in selected_vars:
-                if var in commentpred:
+        #affichage
+  for var in selected_vars:
+            if var in commentpred:
                     st.info(f"{var}: {commentpred[var]}")
-                else:
+            else:
                     st.info(f"aucun commentaire disponible pour {var}.")
-    else:
-        st.write("veuillez selectionner les variables pour afficher les graphiques et commentaires associés.")
-    
-    st.markdown(
+  else:
+        st.write("Veuillez sélectionner les variables pour afficher les graphiques et commentaires associés.")
+  st.markdown(
         """
         <style>
-            .big-font {
-                font-size: 32px !important;
-                color: #1E90FF;  /* Dodger Blue */
-                text-align: center;
-            }
             .highlight {
-                padding: 20px;
+                background-color: #F0F8FF;  /* Alice Blue */
+                padding: 15px;
                 border-radius: 8px;
                 text-align: center;
-            }
-            .section {
-                background-color: #F0F8FF;  /* Alice Blue */
-                padding: 30px;
-                border-radius: 20px;
-                text-align: center;
+                font-size: 24px;
             }
         </style>
         """,
         unsafe_allow_html=True
     )
-    st.markdown('<p class="big-font">Proposition de Profil client à contacter</p>', unsafe_allow_html=True)
-    st.write("""Notre analyse des données de souscription au dépôt à terme révèle des tendances intéressantes parmi les clients les plus susceptibles de souscrire. 
-    Majoritairement, ce sont des managers, techniciens et ouvriers, avec une répartition variée parmi d'autres métiers.""") 
-    
-    st.write("""L'âge moyen des clients potentiels se situe autour de 38 ans, principalement dans la tranche de 30 à 34 ans. 
-    Concernant le statut matrimonial, les clients mariés sont plus enclins à souscrire, suivis des célibataires et des divorcés. 
-    Le niveau d'éducation le plus courant est le secondaire, suivi de près par le tertiaire.""") 
-    
-    st.write("""Sur le plan financier, les soldes bancaires varient généralement de 0 à 5 000K, bien que quelques cas extrêmes soient observés. La plupart des clients potentiels ne sont pas en défaut de paiement et n'ont pas de crédit immobilier ou de prêt personnel. 
-    Il est recommandé de les contacter principalement par téléphone portable, particulièrement entre le 12 et le 15 du mois. 
-    Mai est identifié comme le mois le plus propice aux souscriptions, suivant une durée d'appel moyenne de 7 minutes. Les clients potentiels ont généralement été contactés une seule fois et n'avaient souvent jamais été démarchés lors des campagnes précédentes.""") 
-    
-    st.write("""Finalement, ceux n'ayant jamais été contactés ou ayant eu des expériences positives dans les campagnes précédentes montrent une plus grande propension à souscrire.""")
+  st.markdown('<p class="highlight">Proposition de Profil client à contacter</p>', unsafe_allow_html=True)
+  st.write("""Notre analyse des données de souscription au dépôt à terme révèle des tendances intéressantes parmi les clients les plus susceptibles de souscrire.
+    Majoritairement, ce sont des managers, techniciens et ouvriers, avec une répartition variée parmi d'autres métiers.""")
+  st.write("""L'âge moyen des clients potentiels se situe autour de 38 ans, principalement dans la tranche de 30 à 34 ans.
+    Concernant le statut matrimonial, les clients mariés sont plus enclins à souscrire, suivis des célibataires et des divorcés.
+    Le niveau d'éducation le plus courant est le secondaire, suivi de près par le tertiaire.""")
+  st.write("""Sur le plan financier, les soldes bancaires varient généralement de 0 à 5 000K, bien que quelques cas extrêmes soient observés. La plupart des clients potentiels ne sont pas en défaut de paiement et n'ont pas de crédit immobilier ou de prêt personnel.
+    Il est recommandé de les contacter principalement par téléphone portable, particulièrement entre le 12 et le 15 du mois.
+    Mai est identifié comme le mois le plus propice aux souscriptions, suivant une durée d'appel moyenne de 7 minutes. Les clients potentiels ont généralement été contactés une seule fois et n'avaient souvent jamais été démarchés lors des campagnes précédentes.""")
+  st.write("""Finalement, ceux n'ayant jamais été contactés ou ayant eu des expériences positives dans les campagnes précédentes montrent une plus grande propension à souscrire.""")
+
